@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=gTerm
+Exec=/usr/bin/gterm
+Comment=Terminal Client
+Terminal=false
+Icon=/usr/share/gterm-sprokkel78/gterm.svg
+Type=Application
