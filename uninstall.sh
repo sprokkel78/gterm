@@ -9,4 +9,3 @@
 rm -rf /usr/share/gterm-sprokkel78
 rm /usr/bin/gterm
 rm /usr/share/applications/com.sprokkel78.gterm.desktop
-rm /usr/share/icons/hicolor/scalable/apps/gterm.svg

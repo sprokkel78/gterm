@@ -4,26 +4,33 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("Vte", "2.91")
 from gi.repository import Gtk, Vte, GLib, Pango, Gdk
 
-
-class TerminalWindow(Gtk.Window):
+# CREATE THE GTK APPLICATION
+class MyApplication(Gtk.Application):
     def __init__(self):
-        Gtk.Window.__init__(self, title="gTerm")
-        self.set_default_size(1200, 500)
+        super().__init__(application_id="com.sprokkel78.gterm")
+        GLib.set_application_name("gTerm")
 
-        self.terminal = Vte.Terminal()
-        self.add(self.terminal)
+    def do_activate(self):
+        global win
+        win = Gtk.ApplicationWindow(application=self, title="gterm")
+
+        win.set_default_size(1200, 500)
+
+        terminal = Vte.Terminal()
+        win.add(terminal)
 
         # Set font
         fontdesc = Pango.FontDescription("Monospace 16")
-        self.terminal.set_font(fontdesc)
+        terminal.set_font(fontdesc)
 
         # Quit app when child (bash) exits
-        self.terminal.connect("child-exited", self.on_child_exited)
+        terminal.connect("child-exited", on_child_exited)
+
         # Get the user's home directory
         home_dir = os.path.expanduser("~")
 
         # Spawn shell
-        self.terminal.spawn_async(
+        terminal.spawn_async(
             Vte.PtyFlags.DEFAULT,
             home_dir,
             ["/bin/bash"],
@@ -37,33 +44,19 @@ class TerminalWindow(Gtk.Window):
             None
         )
 
-    def on_key_pressed(self, widget, event):
-        state = event.state
-        keyval = event.keyval
+        app = terminal.get_toplevel().get_application()
+        win.connect("destroy", app.quit) # window close button
+        win.show_all()
 
-        # Ctrl+Shift+C for copy
-        if (state & Gdk.ModifierType.CONTROL_MASK) and \
-           (state & Gdk.ModifierType.SHIFT_MASK) and \
-           keyval == ord('C'):
-            self.terminal.copy_clipboard()
-            return True
+def on_child_exited(terminal, status):
+   app = terminal.get_toplevel().get_application()
+   if app:
+       app.quit()
 
-        # Ctrl+Shift+V for paste
-        if (state & Gdk.ModifierType.CONTROL_MASK) and \
-           (state & Gdk.ModifierType.SHIFT_MASK) and \
-           keyval == ord('V'):
-            self.terminal.paste_clipboard()
-            return True
-
-        return False
-
-    def on_child_exited(self, terminal, status):
-        """Callback when the shell process exits"""
-        Gtk.main_quit()
-
+# START THE APPLICATION
+def main():
+    app = MyApplication()
+    app.run(None)
 
 if __name__ == "__main__":
-    win = TerminalWindow()
-    win.connect("destroy", Gtk.main_quit)  # window close button
-    win.show_all()
-    Gtk.main()
+    main()
