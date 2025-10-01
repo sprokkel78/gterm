@@ -3,7 +3,6 @@
 ![Screenshot](https://github.com/sprokkel78/gterm/blob/main/screenshots/gterm-1.png)
 
 A simple Terminal App in PyGtk3. (Linux) 
-It requires Python3.10 and the PyGTK apps. Developed on Fedora 42 and tested on Ubuntu 24.04.
 
 Runs out of the	box after default installation of Fedora or Ubuntu.
 
